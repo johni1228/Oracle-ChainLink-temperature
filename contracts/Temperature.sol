@@ -23,7 +23,7 @@ contract Temperature is Ownable {
     return temperature;
   }
 
-  function setTemperature(uint256 _temperature) public returns(uint256) isContraller{
+  function setTemperature(uint256 _temperature) external isContraller{
     temperature = _temperature;
   }
 
