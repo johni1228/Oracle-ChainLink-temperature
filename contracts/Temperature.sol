@@ -1,37 +1,30 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity >= 0.5.0 < 0.6.0;
+pragma solidity 0.8.4;
 
-import "provable-eth-api/provableAPI.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Temperature is usingProvable {
+contract Temperature is Ownable {
 
-    uint public temp ;
-    uint private subTemp = 0;
+  uint256 private temperature;
 
-    event LogCurrentTemperature(string temp);
-    event LogNewProvableQuery(string description);
+  mapping (address => true) contraller; 
+  
+  modifier isContraller() {
+    require(contraller[msg.sender], "not Contraller");
+    _;
+  }
 
-    constructor() public {
-        currentTemp();
-    }
+  // only set Gnosis address
+  function setContraller(address _newAddress) external onlyOwner {    
+    contraller[_newAddress] = true;
+  }
 
-    function __callback(bytes32 _myid, string memory _result) public {
-        require(msg.sender == provable_cbAddress());
-        emit LogCurrentTemperature(_result);
-        temp = parseInt(_result, 2);
-    }
+  function getTemperature() public view returns (uint256) {
+    return temperature;
+  }
 
-    function currentTemp() public payable {
-        emit LogNewProvableQuery("Provable query was sent, standing by for the answer...");
-        provable_query("URL", "xml(https://api.openweathermap.org/data/2.5/weather?q=London&mode=xml&appid=493458e0a06ff6e5bc64697fc01b6d78).current.temperature");
-    }
+  function setTemperature(uint256 _temperature) public returns(uint256) isContraller{
+    temperature = _temperature;
+  }
 
-    function getTemperature() public returns (uint) {
-        temp = temp - subTemp;
-        return temp;
-    }
-
-    function setTemperature(uint _subTemp) public {
-        subTemp = _subTemp;
-    }
 }
