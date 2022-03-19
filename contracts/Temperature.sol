@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity >= 0.5.0 < 0.6.0;
 
-import "github.com/provable-things/ethereum-api/provableAPI.sol";
-import "hardhat/console.sol";
+import "provable-eth-api/provableAPI.sol";
 
 contract Temperature is usingProvable {
 
@@ -27,8 +26,9 @@ contract Temperature is usingProvable {
         provable_query("URL", "xml(https://api.openweathermap.org/data/2.5/weather?q=London&mode=xml&appid=493458e0a06ff6e5bc64697fc01b6d78).current.temperature");
     }
 
-    function getTemperature() public view returns (uint) {
-        return temp.div(subTemp);
+    function getTemperature() public returns (uint) {
+        temp = temp - subTemp;
+        return temp;
     }
 
     function setTemperature(uint _subTemp) public {
